@@ -1,0 +1,23 @@
+{
+  "segment1":
+    {
+      "vehicle": "Red",
+      "pedestrian" : "Red"
+    },
+  "segment2":
+    {
+      "vehicle": "Red",
+      "pedestrian" : "Red"
+    },
+  "segment3":
+    {
+      "vehicle": "Green",
+      "pedestrian" : "Green"
+    },
+  "segment4":
+    {
+      "vehicle": "Green",
+      "pedestrian" : "Green"
+    }
+
+}

@@ -1,0 +1,61 @@
+{
+  "Component Instances": [
+    {
+      "Name" : "0",
+      "Definition" : "intersection_component.Intersection_Component",
+      "Timers" : [
+        {
+          "Name" : "timer",
+          "Priority" : 50,
+          "Period" : 0.5,
+          "Function": "update"
+        }
+      ],
+      "Subscribers" : [
+        {
+          "Name": "QE",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinateE",
+          "Endpoints": ["tcp://10.1.1.2:5010",
+                        "tcp://10.1.1.2:5011",
+                        "tcp://10.1.1.2:5012"
+                        ]
+        },
+        {
+          "Name": "QS",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "coordinateS",
+          "Endpoints": ["tcp://10.1.1.3:5021",
+                        "tcp://10.1.1.3:5022",
+                        "tcp://10.1.1.3:5023"]
+        }
+      ],
+      "Publishers" :[
+        {
+          "Name" : "pushNQ",
+            "Endpoints" : ["tcp://10.1.1.1:5000"]
+        },
+        {
+          "Name" : "pushEQ",
+          "Endpoints" : ["tcp://10.1.1.1:5001"]
+        },
+        {
+          "Name" : "pushSQ",
+          "Endpoints" : ["tcp://10.1.1.1:5002"]
+        },
+        {
+          "Name" : "pushWQ",
+            "Endpoints" : ["tcp://10.1.1.1:5003"]
+        }
+      ],
+      "Clients" : [
+        {
+          "Name" : "Network_Port",
+          "Endpoints" : ["tcp://10.1.1.1:6000"]
+        }
+	    ]
+    }
+  ]
+}
