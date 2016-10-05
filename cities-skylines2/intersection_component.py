@@ -287,11 +287,11 @@ class Intersection_Component(Component):
 
     def send(self, data_string):
         self.sock.settimeout(1)
-        self.sock.sendto(data_string, ("191.168.127.100",11000))
+        self.sock.sendto(data_string, ("192.168.0.112",11000))
 
         try:
             response, srvr = self.sock.recvfrom(1024)
-        except timeout:
+        except socket.timeout:
             response = ""
             print 'Request timed out'
         return response
