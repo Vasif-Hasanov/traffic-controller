@@ -7,6 +7,9 @@ pp = pprint.PrettyPrinter(indent=4)
 import json
 from time import time
 import socket
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
 
 class Intersection_Component(Component):
     """docstring for Network_Component"""
@@ -16,8 +19,8 @@ class Intersection_Component(Component):
         #queue parameters
         self.Qs = [randint(0,2) for i in xrange(4)] #[N E S W]
         self.neighbors = [0, 0, 0, 0]
-        self.minInterval = [20, 20]
-        self.maxInterval = [60, 80]
+        self.minInterval = [20, 20]#stay in state at least 20s
+        self.maxInterval = [60, 80]#don't stay longer than 60s in state1/80s in state 2
         self.threshold1 = [20, 20] #if density % is lower don't switch
         self.threshold2 = [40, 40] #if density % if higher don't switch
         self.statesList = ['1', '2']
@@ -37,18 +40,20 @@ class Intersection_Component(Component):
         self.initialized = False
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.sock.bind((UDP_IP, UDP_PORT))
+        self.prefix = 'segment'
 
     def update(self):
         #print self.clock
         #print self.Qs
         #print self.statesList[self.currentIdx]
+        self.State = self.getState()
         if not self.initialized:
+            logging.info('First run of update: Get current state of lights')
             self.initialized = True
-            self.State = self.getState()
+            self.State = self.switchState()
             self.clock = time()
 
         if True == self.controllor():
-            print "SWITCHING STATE"
             self.switchState()
             self.clock = time()
         else:
@@ -98,16 +103,19 @@ class Intersection_Component(Component):
 
     def controllor(self):
         currentState = self.statesList[self.currentIdx]
-        if (time() - self.clock) < self.minInterval[self.currentIdx]:
+        delT = time() - self.clock
+        logging.info("@controllor %s: Time elapsed: %f", self.name, delT)
+
+        if delT < self.minInterval[self.currentIdx]:
             return False
 
-        if (time() - self.clock) >= self.maxInterval[self.currentIdx]:
+        if delT >= self.maxInterval[self.currentIdx]:
             return True
 
         #get queue data
         redQ = 0
         GreenQ = 0
-
+        logging.debug('@controllor\nstate:\n%s', self.State)
         for idx, i in enumerate(self.State):
             if (self.State[i]['vehicle']) == 'Green':
                 self.Qs[idx] = self.getDensity(i)
@@ -138,15 +146,37 @@ class Intersection_Component(Component):
             return True
 
     def switchState(self):
+        print "SWITCHING STATE"
+        #The state has a min/max time and queue length for state. State is 1 or 2
         self.currentIdx = (self.currentIdx + 1) % len(self.statesList)
-        print self.State
+        #pp.pprint("@switchState - current state: ", self.State)
+        #print self.State
+        logging.info("@switchState: current state: \n %s\n", pprint.pformat(self.State))
+        '''
         for i in self.State:
+            logging.info('-----------@switchState %s\n\n', i)
             if (self.State[i]['vehicle']) == 'Green':
                 self.setState(i, "Red", "Red")
             elif (self.State[i]['vehicle']) == 'Red':
                 self.setState(i, "Green", "Red")
             else:
                 assert False
+        '''
+        self.State = self.getState()
+        if (self.State[self.prefix+str(0)]['vehicle'] == 'Green'):
+            self.setState(self.prefix+str(0), "Red", "Red")
+            self.setState(self.prefix+str(3), "Red", "Red")
+            self.setState(self.prefix+str(1), "Green", "Red")
+            self.setState(self.prefix+str(2), "Green", "Red")
+
+        else:
+            self.setState(self.prefix+str(0), "Green", "Red")
+            self.setState(self.prefix+str(3), "Green", "Red")
+            self.setState(self.prefix+str(1), "Red", "Red")
+            self.setState(self.prefix+str(2), "Red", "Red")
+        ''''''
+        logging.info("@switchState: new state: \n %s \n", pprint.pformat(self.State))
+
 
     def keepState(self):
         pass
@@ -192,30 +222,24 @@ class Intersection_Component(Component):
         #pp.pprint("message" + msg)
 
     def getState(self):
-        """
-            else if (request.Method == MethodType.GETSTATE)
-            {
-                object nodeIdObj = GetObject(request.Object);
-                int nodeId = Convert.ToInt32(nodeIdObj);
-                retObj = GetNodeState(nodeId);
-            }
-        """
+        logging.debug('@getState\n node: %s\n', self.name)
         data = {
                 'Method': 'GETSTATE',
                 'Object': {
                 	       'Name': 'NodeId',
                            'Type': 'PARAMETER',
-                           'Value': self.name,  #// should be 0 - 3 (for the selected ids)
+                           'Value': self.name,  #// should be 0 - 3 (for the selected Intersection)
                            'ValueType': 'System.UInt32'
                            }
                }
         data_string = json.dumps(data)
-
+        logging.debug("@getState\nbefore send")
         response = self.send(data_string)
+        logging.debug("@getState, after send\n")
         #state = json.load(response)
         #with open('dummy.json') as node_string:
         state = json.loads(response)
-        #pp.pprint(state)
+        logging.debug("@getState: Response from simulator: \n %s\n", pprint.pformat(state))
         return state
 
     def getDensity(self, segment):
@@ -239,12 +263,15 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
 	#pp.pprint(data_string)
+        logging.debug('@getDensity\nbefore send')
         response = self.send(data_string)
+        logging.debug('@getDensity, after send\n')
+        logging.info('@getDensity\nIntscn=%s, Seg=%s; density: %s\n\n', self.name, segment[-1], response)
         #print response
 	#density = int(json.loads(response))
         #density = randint(0, 100)
         density = int(response)
-	return density
+        return density;
 
     def setState(self, segment, vehicleState, pedestrianState ):
         self.State[segment]['vehicle'] = vehicleState
@@ -280,18 +307,22 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
 	#print data_string
+        logging.debug('@setState\nbefore send')
         response = self.send(data_string)
+        logging.debug('@setState, after send\n')
 	#print response
         #response = "ACK"
         return response
 
     def send(self, data_string):
         self.sock.settimeout(1)
-        self.sock.sendto(data_string, ("191.168.127.100",11000))
-
+        self.sock.sendto(data_string, ("192.168.0.112",11000))
+        logging.debug('@send, Intscn: %s, msg: %s', self.name, pprint.pformat(data_string))
         try:
             response, srvr = self.sock.recvfrom(1024)
-        except timeout:
-            response = ""
-            print 'Request timed out'
-        return response
+            logging.debug('@send, response: %s', response )
+            return response;
+        except socket.timeout:
+            logging.ERROR('Request timed out')
+            response = 99
+            return response

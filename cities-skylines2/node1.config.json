@@ -35,27 +35,21 @@
       "Publishers" :[
         {
           "Name" : "pushNQ",
-            "Endpoints" : ["tcp://10.1.1.1:5000"]
+            "Endpoints" : ["tcp://192.168.0.103:5000"]
         },
         {
           "Name" : "pushEQ",
-          "Endpoints" : ["tcp://10.1.1.1:5001"]
+          "Endpoints" : ["tcp://192.168.0.103:5001"]
         },
         {
           "Name" : "pushSQ",
-          "Endpoints" : ["tcp://10.1.1.1:5002"]
+          "Endpoints" : ["tcp://192.168.0.103:5002"]
         },
         {
           "Name" : "pushWQ",
-            "Endpoints" : ["tcp://10.1.1.1:5003"]
+            "Endpoints" : ["tcp://192.168.0.103:5003"]
         }
-      ],
-      "Clients" : [
-        {
-          "Name" : "Network_Port",
-          "Endpoints" : ["tcp://10.1.1.1:6000"]
-        }
-	    ]
+      ]
     }
   ]
 }
