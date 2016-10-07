@@ -28,6 +28,7 @@ class Intersection_Component(Component):
         self.clock = 0
         #pp.pprint(self.clock)
         #register timer
+        self.State = {}
         self.register_timer_operation("update", self.update)
         #register subscriber function
         self.register_subscriber_operation("coordinateN", self.coordinateN)
@@ -43,14 +44,10 @@ class Intersection_Component(Component):
         self.prefix = 'segment'
 
     def update(self):
-        #print self.clock
-        #print self.Qs
-        #print self.statesList[self.currentIdx]
-        self.State = self.getState()
         if not self.initialized:
-            logging.info('First run of update: Get current state of lights')
+            logging.info('@UPDATE First run I=%s\n', self.name)
             self.initialized = True
-            self.State = self.switchState()
+            self.switchState()
             self.clock = time()
 
         if True == self.controllor():
@@ -87,13 +84,11 @@ class Intersection_Component(Component):
                     'State': self.statesList[self.currentIdx]
                 }
 
-        #pp.pprint(NQ_data['Intersection'])
         NQ_data_string = json.dumps(NQ_data)
         EQ_data_string = json.dumps(EQ_data)
         SQ_data_string = json.dumps(SQ_data)
         WQ_data_string = json.dumps(WQ_data)
-        #pp.pprint(NQ_data_string)
-        #NQmsg = [self.name, "NQ", self.Qs[0], self.statesList[self.currentIdx]]
+
         self.publisher("pushNQ").send(NQ_data_string)
         self.publisher("pushEQ").send(EQ_data_string)
         self.publisher("pushSQ").send(SQ_data_string)
@@ -115,7 +110,7 @@ class Intersection_Component(Component):
         #get queue data
         redQ = 0
         GreenQ = 0
-        logging.debug('@controllor\nstate:\n%s', self.State)
+        logging.debug('@controllor %s state:\n%s', self.name, self.State)
         for idx, i in enumerate(self.State):
             if (self.State[i]['vehicle']) == 'Green':
                 self.Qs[idx] = self.getDensity(i)
@@ -146,12 +141,14 @@ class Intersection_Component(Component):
             return True
 
     def switchState(self):
-        print "SWITCHING STATE"
-        #The state has a min/max time and queue length for state. State is 1 or 2
+        logging.debug("SWITCHING STATE")
+        self.State = self.getState()
+
+      #The state has a min/max time and queue length for state. State is 1 or 2
         self.currentIdx = (self.currentIdx + 1) % len(self.statesList)
         #pp.pprint("@switchState - current state: ", self.State)
         #print self.State
-        logging.info("@switchState: current state: \n %s\n", pprint.pformat(self.State))
+        logging.debug("@SWITCHSTATE %s: currentState: \n %s\n", self.name, pprint.pformat(self.State))
         '''
         for i in self.State:
             logging.info('-----------@switchState %s\n\n', i)
@@ -162,7 +159,6 @@ class Intersection_Component(Component):
             else:
                 assert False
         '''
-        self.State = self.getState()
         if (self.State[self.prefix+str(0)]['vehicle'] == 'Green'):
             self.setState(self.prefix+str(0), "Red", "Red")
             self.setState(self.prefix+str(3), "Red", "Red")
@@ -175,7 +171,7 @@ class Intersection_Component(Component):
             self.setState(self.prefix+str(1), "Red", "Red")
             self.setState(self.prefix+str(2), "Red", "Red")
         ''''''
-        logging.info("@switchState: new state: \n %s \n", pprint.pformat(self.State))
+        logging.debug("@SWITCHSTATE %s: NEW STATE: \n %s \n",self.name, pprint.pformat(self.State))
 
 
     def keepState(self):
@@ -222,7 +218,7 @@ class Intersection_Component(Component):
         #pp.pprint("message" + msg)
 
     def getState(self):
-        logging.debug('@getState\n node: %s\n', self.name)
+        logging.debug('@GETSTATE node: %s\n', self.name)
         data = {
                 'Method': 'GETSTATE',
                 'Object': {
@@ -233,13 +229,13 @@ class Intersection_Component(Component):
                            }
                }
         data_string = json.dumps(data)
-        logging.debug("@getState\nbefore send")
+        logging.debug("@GETSTATE %s before send", self.name)
         response = self.send(data_string)
-        logging.debug("@getState, after send\n")
+        logging.debug("@GETSTATE %s after send\n", self.name)
         #state = json.load(response)
         #with open('dummy.json') as node_string:
         state = json.loads(response)
-        logging.debug("@getState: Response from simulator: \n %s\n", pprint.pformat(state))
+        logging.debug("@GETSTATE: Response from simulator: \n %s\n", pprint.pformat(state))
         return state
 
     def getDensity(self, segment):
@@ -263,7 +259,7 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
 	#pp.pprint(data_string)
-        logging.debug('@getDensity\nbefore send')
+        logging.debug('@getDensity before send')
         response = self.send(data_string)
         logging.debug('@getDensity, after send\n')
         logging.info('@getDensity\nIntscn=%s, Seg=%s; density: %s\n\n', self.name, segment[-1], response)
@@ -276,6 +272,7 @@ class Intersection_Component(Component):
     def setState(self, segment, vehicleState, pedestrianState ):
         self.State[segment]['vehicle'] = vehicleState
         self.State[segment]['pedestrian'] = pedestrianState
+        logging.debug('@SETSTATE name:%s, seg:%s, state:\n%s', self.name, segment[-1], self.State)
         data = {
                 'Method': 'SETSTATE',
                 'Object':
@@ -307,22 +304,24 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
 	#print data_string
-        logging.debug('@setState\nbefore send')
+        logging.debug('@SETSTATE %s before send\n', segment[-1])
         response = self.send(data_string)
-        logging.debug('@setState, after send\n')
+        logging.debug('@SETSTATE, after send\n')
 	#print response
         #response = "ACK"
         return response
 
     def send(self, data_string):
-        self.sock.settimeout(1)
-        self.sock.sendto(data_string, ("192.168.0.112",11000))
-        logging.debug('@send, Intscn: %s, msg: %s', self.name, pprint.pformat(data_string))
+        self.sock.settimeout(1) #need this in case of message loss
+        self.sock.sendto(data_string, ("192.168.0.111",11000))
+        logging.debug('@send, I: %s, msg: %s\n', self.name, pprint.pformat(data_string))
         try:
             response, srvr = self.sock.recvfrom(1024)
             logging.debug('@send, response: %s', response )
-            return response;
         except socket.timeout:
             logging.ERROR('Request timed out')
-            response = 99
-            return response
+            response =  {u'segment0': {u'vehicle': u'Red'},
+                         u'segment1': {u'vehicle': u'Red'},
+                         u'segment2': {u'vehicle': u'Red'},
+                         u'segment3': {u'vehicle': u'Red'}}
+        return response
