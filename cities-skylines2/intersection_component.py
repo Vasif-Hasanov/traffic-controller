@@ -47,8 +47,10 @@ class Intersection_Component(Component):
         if not self.initialized:
             logging.info('@UPDATE First run I=%s\n', self.name)
             self.initialized = True
+            self.State = self.getState() #populate State, so we can set it.
             for index, item in enumerate(self.State):
-                if index == (0 or 3):
+                logging.info("@UPDATE name:%s, index:%s, seg:%s", self.name, index, item)
+                if index in (0, 3):
                     self.setState(item, "Red", "Red")
                 else:
                      self.setState(item, "Green", "Red")
@@ -267,17 +269,28 @@ class Intersection_Component(Component):
         logging.debug('@getDensity before send')
         response = self.send(data_string)
         logging.debug('@getDensity, after send\n')
-        logging.info('@getDensity name=%s, Seg=%s; density: %s', self.name, segment[-1], response)
+        logging.debug('@getDensity name=%s, Seg=%s; density: %s', self.name, segment[-1], response)
         #print response
 	#density = int(json.loads(response))
         #density = randint(0, 100)
-        density = int(response)
-        return density;
+        if type(response) not in (int, str):
+            print "\n\n"
+
+            logging.error(
+"\n ------@GETDENSITY RECEIVED BAD MESSAGE-----:\n \
+_____________________________________________\n \
+%s, type:%s \n\n", response, type(response))
+
+            density = int(self.getDensity(segment))
+            return density;
+        else:
+            density = int(response)
+            return density;
 
     def setState(self, segment, vehicleState, pedestrianState ):
         self.State[segment]['vehicle'] = vehicleState
         self.State[segment]['pedestrian'] = pedestrianState
-        logging.debug('@SETSTATE name:%s, seg:%s, state:\n%s', self.name, segment[-1], self.State)
+        logging.info('@SETSTATE name:%s, seg:%s, state:\n%s\n', self.name, segment[-1], pprint.pformat(self.State))
         data = {
                 'Method': 'SETSTATE',
                 'Object':
@@ -309,9 +322,9 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
 	#print data_string
-        logging.debug('@SETSTATE %s before send\n', segment[-1])
+        logging.debug('@SETSTATE name:%s seg:%s before send\n', self.name, segment[-1])
         response = self.send(data_string)
-        logging.debug('@SETSTATE, after send\n')
+        logging.debug('@SETSTATE name:%s seg:%s after send\n', self.name, segment[-1])
 	#print response
         #response = "ACK"
         return response
@@ -319,10 +332,10 @@ class Intersection_Component(Component):
     def send(self, data_string):
         self.sock.settimeout(1) #need this in case of message loss
         self.sock.sendto(data_string, ("192.168.0.111",11000))
-        logging.debug('@send, I: %s, msg: %s\n', self.name, pprint.pformat(data_string))
+        #logging.debug('@send, I: %s, msg: %s\n', self.name, pprint.pformat(data_string))
         try:
             response, srvr = self.sock.recvfrom(1024)
-            logging.debug('@send, response: %s', response )
+            #logging.debug('@send, response: %s', response )
         except socket.timeout:
             logging.error('Request timed out')
             response =  {u'segment0': {u'vehicle': u'Red'},
