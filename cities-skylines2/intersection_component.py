@@ -8,7 +8,7 @@ import json
 from time import time
 import socket
 import logging
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 
 class Intersection_Component(Component):
@@ -47,7 +47,11 @@ class Intersection_Component(Component):
         if not self.initialized:
             logging.info('@UPDATE First run I=%s\n', self.name)
             self.initialized = True
-            self.switchState()
+            for index, item in enumerate(self.State):
+                if index == (0 or 3):
+                    self.setState(item, "Red", "Red")
+                else:
+                     self.setState(item, "Green", "Red")
             self.clock = time()
 
         if True == self.controllor():
@@ -149,9 +153,9 @@ class Intersection_Component(Component):
         #pp.pprint("@switchState - current state: ", self.State)
         #print self.State
         logging.debug("@SWITCHSTATE %s: currentState: \n %s\n", self.name, pprint.pformat(self.State))
-        '''
+
         for i in self.State:
-            logging.info('-----------@switchState %s\n\n', i)
+            logging.debug('@SWITCHSTATE name:%s %s\n\n',self.name, i)
             if (self.State[i]['vehicle']) == 'Green':
                 self.setState(i, "Red", "Red")
             elif (self.State[i]['vehicle']) == 'Red':
@@ -170,8 +174,9 @@ class Intersection_Component(Component):
             self.setState(self.prefix+str(3), "Green", "Red")
             self.setState(self.prefix+str(1), "Red", "Red")
             self.setState(self.prefix+str(2), "Red", "Red")
-        ''''''
-        logging.debug("@SWITCHSTATE %s: NEW STATE: \n %s \n",self.name, pprint.pformat(self.State))
+        '''
+        print "\n"
+        logging.info("@SWITCHSTATE--- %s---: NEW STATE: \n %s \n",self.name, pprint.pformat(self.State))
 
 
     def keepState(self):
@@ -201,7 +206,7 @@ class Intersection_Component(Component):
         else:
             assert False
         #{State, Intersection, Segment, QDensity}
-        pp.pprint(msg + segment)
+        #pp.pprint(msg + segment)
         #print (self.neighbors)
 
     def coordinateN(self, msg):
@@ -262,7 +267,7 @@ class Intersection_Component(Component):
         logging.debug('@getDensity before send')
         response = self.send(data_string)
         logging.debug('@getDensity, after send\n')
-        logging.info('@getDensity\nIntscn=%s, Seg=%s; density: %s\n\n', self.name, segment[-1], response)
+        logging.info('@getDensity name=%s, Seg=%s; density: %s', self.name, segment[-1], response)
         #print response
 	#density = int(json.loads(response))
         #density = randint(0, 100)
@@ -319,7 +324,7 @@ class Intersection_Component(Component):
             response, srvr = self.sock.recvfrom(1024)
             logging.debug('@send, response: %s', response )
         except socket.timeout:
-            logging.ERROR('Request timed out')
+            logging.error('Request timed out')
             response =  {u'segment0': {u'vehicle': u'Red'},
                          u'segment1': {u'vehicle': u'Red'},
                          u'segment2': {u'vehicle': u'Red'},
