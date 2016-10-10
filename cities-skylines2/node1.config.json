@@ -67,28 +67,45 @@
       ]
     },
 
+
     {
-      "Name" : "server_component",
-	    "Definition" : "server.ServerComponent",
+      "Name" : "setState_component",
+	    "Definition" : "simserver_component.simServer_Component",
+
+	    "Servers" : [
+        {
+          "Name" : "setState_port",
+          "Priority" : 60,
+          "Function" : "send",
+          "Endpoints" : ["tcp://*:7002"]
+        }
+      ]
+    },
+
+    {
+      "Name" : "getState_component",
+	    "Definition" : "simserver_component.simServer_Component",
 
 	    "Servers" : [
         {
           "Name" : "getState_port",
           "Priority" : 60,
-          "Function" : "getState",
+          "Function" : "send",
           "Endpoints" : ["tcp://*:7000"]
-        },
+        }
+      ]
+    },
+
+    {
+      "Name" : "getDensity_component",
+	    "Definition" : "simserver_component.simServer_Component",
+
+	    "Servers" : [
         {
           "Name" : "getDensity_port",
           "Priority" : 60,
-          "Function" : "getDensity",
+          "Function" : "send",
           "Endpoints" : ["tcp://*:7001"]
-        },
-        {
-          "Name" : "setState_port",
-          "Priority" : 60,
-          "Function" : "setState",
-          "Endpoints" : ["tcp://*:7002"]
         }
       ]
     }

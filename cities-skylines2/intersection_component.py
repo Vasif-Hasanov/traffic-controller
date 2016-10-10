@@ -237,7 +237,7 @@ class Intersection_Component(Component):
                }
         data_string = json.dumps(data)
         logging.debug("@GETSTATE %s before send", self.name)
-        state = self.client("getState_port").call(data_string)
+        response = self.client("getState_port").call(data_string)
         logging.debug("@GETSTATE %s after send\n", self.name)
         state = json.loads(response)
         logging.debug("@GETSTATE: Response from simulator: \n %s\n", pprint.pformat(state))
@@ -264,7 +264,7 @@ class Intersection_Component(Component):
                 }
         data_string = json.dumps(data)
         logging.debug('@getDensity before send')
-        response = self.send(data_string)
+        response = self.client("getDensity_port").call(data_string)
         logging.debug('@getDensity, after send\n')
         logging.debug('@getDensity name=%s, Seg=%s; density: %s', self.name, segment[-1], response)
         if type(response) not in (int, str):
@@ -317,11 +317,11 @@ _____________________________________________\n \
         data_string = json.dumps(data)
 	#print data_string
         logging.debug('@SETSTATE name:%s seg:%s before send\n', self.name, segment[-1])
-        response = self.send(data_string)
+        response = self.client("setState_port").call(data_string)
         logging.debug('@SETSTATE name:%s seg:%s after send\n', self.name, segment[-1])
 	#print response
         #response = "ACK"
-        return response
+        #return response
 
     def send(self, data_string):
         self.sock.settimeout(1) #need this in case of message loss
