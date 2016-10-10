@@ -237,10 +237,8 @@ class Intersection_Component(Component):
                }
         data_string = json.dumps(data)
         logging.debug("@GETSTATE %s before send", self.name)
-        response = self.send(data_string)
+        state = self.client("getState_port").call(data_string)
         logging.debug("@GETSTATE %s after send\n", self.name)
-        #state = json.load(response)
-        #with open('dummy.json') as node_string:
         state = json.loads(response)
         logging.debug("@GETSTATE: Response from simulator: \n %s\n", pprint.pformat(state))
         return state
@@ -265,14 +263,10 @@ class Intersection_Component(Component):
                          }
                 }
         data_string = json.dumps(data)
-	#pp.pprint(data_string)
         logging.debug('@getDensity before send')
         response = self.send(data_string)
         logging.debug('@getDensity, after send\n')
         logging.debug('@getDensity name=%s, Seg=%s; density: %s', self.name, segment[-1], response)
-        #print response
-	#density = int(json.loads(response))
-        #density = randint(0, 100)
         if type(response) not in (int, str):
             print "\n\n"
 
@@ -338,8 +332,5 @@ _____________________________________________\n \
             #logging.debug('@send, response: %s', response )
         except socket.timeout:
             logging.error('Request timed out')
-            response =  {u'segment0': {u'vehicle': u'Red'},
-                         u'segment1': {u'vehicle': u'Red'},
-                         u'segment2': {u'vehicle': u'Red'},
-                         u'segment3': {u'vehicle': u'Red'}}
+            response =  0
         return response
