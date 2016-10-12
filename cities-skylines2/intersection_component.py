@@ -29,6 +29,7 @@ class Intersection_Component(Component):
         #pp.pprint(self.clock)
         #register timer
         self.State = {}
+        self.ServerState = {}
         self.register_timer_operation("update", self.update)
         #register subscriber function
         self.register_subscriber_operation("coordinateN", self.coordinateN)
@@ -46,20 +47,27 @@ class Intersection_Component(Component):
         self.msgID = 123
 
     def update(self):
-        if (bool(self.State) and not self.initialized):
+        if (bool(self.ServerState) and not self.initialized):
             logging.info('@UPDATE First run I=%s\n', self.name)
             self.initialized = True
+            self.State = self.ServerState
             #self.State = self.getState() #populate State, so we can set it.
             logging.info('@UPDATE: self.State: %s', self.State)
             for index, item in enumerate(self.State):
                 logging.info("@UPDATE name:%s, index:%s, seg:%s", self.name, index, item)
-                if index in (0, 3):
-                    self.setState(item, "Red", "Red")
+                seg = int(item[-1])
+                if seg in (0, 1):
+                    self.State[item]['vehicle'] = 'Red'
+                    self.State[item]['pedestrian'] = 'Red'
+                    #self.setState(item, "Red", "Red")
                 else:
-                     self.setState(item, "Green", "Red")
+                    self.State[item]['vehicle'] = 'Green'
+                    self.State[item]['pedestrian'] = 'Red'
+            self.setState()
+
             self.clock = time()
         elif (not self.initialized):
-            logging.info("Waiting for server")
+            logging.info("@UPDATE name: %s Waiting for server", self.name)
         else:
             if True == self.controllor():
                 self.switchState()
@@ -158,17 +166,23 @@ class Intersection_Component(Component):
         #print self.State
         logging.debug("@SWITCHSTATE %s: currentState: \n %s\n", self.name, pprint.pformat(self.State))
 
-        for i in self.State:
-            logging.debug('@SWITCHSTATE name:%s %s\n\n',self.name, i)
-            if (self.State[i]['vehicle']) == 'Green':
-                self.setState(i, "Red", "Red")
-            elif (self.State[i]['vehicle']) == 'Red':
-                self.setState(i, "Green", "Red")
+
+        for index, item in enumerate(self.State):
+            logging.debug('@SWITCHSTATE name:%s %s\n\n',self.name, item)
+            if (self.State[item]['vehicle']) == 'Green':
+                self.State[item]['vehicle'] = 'Red'
+                self.State[item]['pedestrian'] = 'Red'
+                #self.setState(i, "Red", "Red")
+            elif (self.State[item]['vehicle']) == 'Red':
+                self.State[item]['vehicle'] = 'Green'
+                self.State[item]['pedestrian'] = 'Red'
+                #self.setState(i, "Green", "Red")
             else:
                 assert False
+        self.setState()
 
         print "\n"
-        logging.info("@SWITCHSTATE--- %s---: NEW STATE: \n %s \n",self.name, pprint.pformat(self.State))
+        logging.debug("@SWITCHSTATE--- %s---: NEW STATE: \n %s \n",self.name, pprint.pformat(self.State))
 
 
     def keepState(self):
@@ -199,24 +213,16 @@ class Intersection_Component(Component):
         self.coordinate(msg, "W")
 
     def subState(self, message):
-        logging.info("@subState: message recieved: %s", message)
-        self.State = json.loads(message)
+        logging.debug("@subState: message recieved: %s", message)
+        self.ServerState = json.loads(message)
 
     def subDensity(self, message):
-        logging.info("@subDensity: message recieved: %s", message)
+        logging.debug("@subDensity: message recieved: %s", message)
         self.Qs = json.loads(message)
 
-    def setState(self, segment, vehicleState, pedestrianState ):
-        self.State[segment]['vehicle'] = vehicleState
-        self.State[segment]['pedestrian'] = pedestrianState
-        logging.info('@SETSTATE name:%s, seg:%s, state:\n%s\n', self.name, segment[-1], pprint.pformat(self.State))
+    def setState(self):
+        logging.debug('@SETSTATE name:%s state:\n%s\n', self.name, pprint.pformat(self.State))
 
-        msg = {
-                'segment' : segment,
-                'vehicleState' : vehicleState,
-                'pedestrianState' : pedestrianState
-        }
-
-        msg_string = json.dumps(msg)
+        msg_string = json.dumps(self.State)
         response = self.client("setState_port").call(msg_string)
         logging.info('name:%s response:%s', self.name, response)

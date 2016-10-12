@@ -38,17 +38,15 @@ class simServer_Component(Component):
         logging.debug('@send, I: %s, msg: %s\n', self.name, pprint.pformat(data_string))
         try:
             response, srvr = self.sock.recvfrom(1024)
-            logging.info('@send, name:%s response: %s',self.name,  response )
+            logging.debug('@send, name:%s response: %s',self.name,  response )
         except socket.timeout:
             logging.debug('Request timed out')
         return response
 
     def setState(self, msg_string):
         logging.info("@SETSTATE name:%s msg_string:%s", self.name, msg_string)
-        msg = json.loads(msg_string)
-        segment = msg['segment']
-        self.State[segment]['vehicle'] = msg['vehicleState']
-        self.State[segment]['pedestrian'] = msg['pedestrianState']
+        self.State = json.loads(msg_string)
+        logging.info('@SETSTATE name:%s state:\n%s\n', self.name, pprint.pformat(self.State))
 
         data = {
                 'Method': 'SETSTATE',
@@ -63,35 +61,84 @@ class simServer_Component(Component):
                                             {
                                             'Name': 'SegmentId',
                                             'Type': 'PARAMETER',
-                                            'Value': segment[-1],
+                                            'Value': '0',
                                             'ValueType': 'System.UInt32'	    },
                                             {
                                             'Name': 'VehicleState',
                                             'Type': 'PARAMETER',
-                                            'Value': msg['vehicleState'],
+                                            'Value': self.State['segment0']['vehicle'],
                                             'ValueType': 'System.String'	    },
                                     	    {
                                     		'Name': 'PedestrianState',
                                     		'Type': 'PARAMETER',
-                                    		'Value': msg['pedestrianState'],
+                                    		'Value':self.State['segment0']['pedestrian'] ,
+                                    		'ValueType': 'System.String'
+                                    	    },
+                                            {
+                                            'Name': 'SegmentId',
+                                            'Type': 'PARAMETER',
+                                            'Value': '1',
+                                            'ValueType': 'System.UInt32'	    },
+                                            {
+                                            'Name': 'VehicleState',
+                                            'Type': 'PARAMETER',
+                                            'Value': self.State['segment1']['vehicle'],
+                                            'ValueType': 'System.String'	    },
+                                    	    {
+                                    		'Name': 'PedestrianState',
+                                    		'Type': 'PARAMETER',
+                                    		'Value':self.State['segment1']['pedestrian'] ,
+                                    		'ValueType': 'System.String'
+                                    	    },
+                                            {
+                                            'Name': 'SegmentId',
+                                            'Type': 'PARAMETER',
+                                            'Value': '2',
+                                            'ValueType': 'System.UInt32'	    },
+                                            {
+                                            'Name': 'VehicleState',
+                                            'Type': 'PARAMETER',
+                                            'Value': self.State['segment2']['vehicle'],
+                                            'ValueType': 'System.String'	    },
+                                    	    {
+                                    		'Name': 'PedestrianState',
+                                    		'Type': 'PARAMETER',
+                                    		'Value':self.State['segment2']['pedestrian'] ,
+                                    		'ValueType': 'System.String'
+                                    	    },
+                                            {
+                                            'Name': 'SegmentId',
+                                            'Type': 'PARAMETER',
+                                            'Value': '3',
+                                            'ValueType': 'System.UInt32'	    },
+                                            {
+                                            'Name': 'VehicleState',
+                                            'Type': 'PARAMETER',
+                                            'Value': self.State['segment3']['vehicle'],
+                                            'ValueType': 'System.String'	    },
+                                    	    {
+                                    		'Name': 'PedestrianState',
+                                    		'Type': 'PARAMETER',
+                                    		'Value':self.State['segment3']['pedestrian'],
                                     		'ValueType': 'System.String'
                                     	    }
 	                                    ]
                             }
                 }
+        logging.info("@SETSTATE name: %s data:\n%s", self.name, pprint.pformat(data))
+
         data_string = json.dumps(data)
         response = self.send(data_string)
         logging.info("@SETSTATE name:%s response:%s", self.name, response)
-
         return "ACK"
 
     def pubState(self):
-        logging.info("publish state")
+        logging.debug("publish state")
         self.getState()
         self.publisher("statePublisher").send(self.state_str)
 
     def getState(self):
-        logging.info('name: %s\n', self.name)
+        logging.debug('name: %s\n', self.name)
         data = {
                 'Method': 'GETSTATE',
                 'Object': {
@@ -121,14 +168,15 @@ class simServer_Component(Component):
             if self.initialized:
                 self.State = json.loads(self.state_str)
         else:
-            logging.info("publish Density")
+            logging.debug("publish Density")
             for index, item in enumerate(self.State):
-                logging.info("@pubDensity item:%s index:%s", item, index)
-                self.Density[index] = self.getDensity(index)
+                logging.debug("@pubDensity item:%s index:%s", item, index)
+                seg = int(item[-1])
+                self.Density[seg] = self.getDensity(seg)
 
             self.publisher("densityPublisher").send(json.dumps(self.Density))
 
-    def getDensity(self, index):
+    def getDensity(self, seg):
         data = {
                 'Method': 'GETDENSITY',
                 'Object':{
@@ -141,7 +189,7 @@ class simServer_Component(Component):
                         	    {
                         		'Name': 'SegmentId',
                         		'Type': 'PARAMETER',
-                        		'Value': index,
+                        		'Value': seg,
                         		'ValueType': 'System.UInt32'
                         	    }
                             ]
@@ -150,7 +198,7 @@ class simServer_Component(Component):
         data_string = json.dumps(data)
         logging.debug("@GETDENSITY %s before send", self.name)
         response = self.send(data_string)
-        logging.info("@GETDENSITY name:%s, index: %s, response:%s, type:%s", self.name, index, response, type(response))
+        logging.debug("@GETDENSITY name:%s, segment: %s, response:%s, type:%s", self.name, seg, response, type(response))
 
         if type(response) is str:
             if (type(json.loads(response)) is int) :
@@ -158,10 +206,10 @@ class simServer_Component(Component):
                 return density
         else:
             print "\n\n----------------------------------------"
-            logging.error("Server not on. old density: %s", self.Density[index])
+            logging.error("Server not on. old density: %s", self.Density[seg])
             print "\n\n----------------------------------------"
 
-            return self.Density[index]
+            return self.Density[seg]
 
     def returnDensity(self, data_string):
         i = int(json.loads(data_string))
