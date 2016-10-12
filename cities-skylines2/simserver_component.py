@@ -44,9 +44,9 @@ class simServer_Component(Component):
         return response
 
     def setState(self, msg_string):
-        logging.info("@SETSTATE name:%s msg_string:%s", self.name, msg_string)
+        logging.debug("@SETSTATE name:%s msg_string:%s", self.name, msg_string)
         self.State = json.loads(msg_string)
-        logging.info('@SETSTATE name:%s state:\n%s\n', self.name, pprint.pformat(self.State))
+        logging.debug('@SETSTATE name:%s state:\n%s\n', self.name, pprint.pformat(self.State))
 
         data = {
                 'Method': 'SETSTATE',
@@ -125,7 +125,7 @@ class simServer_Component(Component):
 	                                    ]
                             }
                 }
-        logging.info("@SETSTATE name: %s data:\n%s", self.name, pprint.pformat(data))
+        logging.debug("@SETSTATE name: %s data:\n%s", self.name, pprint.pformat(data))
 
         data_string = json.dumps(data)
         response = self.send(data_string)

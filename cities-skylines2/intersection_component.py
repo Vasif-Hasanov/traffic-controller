@@ -215,6 +215,9 @@ class Intersection_Component(Component):
     def subState(self, message):
         logging.debug("@subState: message recieved: %s", message)
         self.ServerState = json.loads(message)
+        print "\n"
+        logging.info('@SUBSTATE name:%s, serverState:\n %s', self.name, pprint.pformat(self.ServerState))
+        print "\n"
 
     def subDensity(self, message):
         logging.debug("@subDensity: message recieved: %s", message)
