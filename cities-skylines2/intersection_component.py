@@ -19,8 +19,8 @@ class Intersection_Component(Component):
         #queue parameters
         self.Qs = [randint(0,2) for i in xrange(4)] #[N E S W]
         self.neighbors = [0, 0, 0, 0]
-        self.minInterval = [20, 20]#stay in state at least 20s
-        self.maxInterval = [60, 80]#don't stay longer than 60s in state1/80s in state 2
+        self.minInterval = [5, 5]#stay in state at least 20s
+        self.maxInterval = [20, 20]#don't stay longer than 60s in state1/80s in state 2
         self.threshold1 = [20, 20] #if density % is lower don't switch
         self.threshold2 = [40, 40] #if density % if higher don't switch
         self.statesList = ['1', '2']
@@ -35,19 +35,22 @@ class Intersection_Component(Component):
         self.register_subscriber_operation("coordinateE", self.coordinateE)
         self.register_subscriber_operation("coordinateS", self.coordinateS)
         self.register_subscriber_operation("coordinateW", self.coordinateW)
+        self.register_subscriber_operation("subState", self.subState)
+        self.register_subscriber_operation("subDensity", self.subDensity)
         #self.sensors = ['N', 'E', 'S', 'W']
         #pp.pprint(self.name) name hasn't been set yet...?
         #how do you call a function immediately after running __init__?
         self.initialized = False
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         #self.sock.bind((UDP_IP, UDP_PORT))
-        self.prefix = 'segment'
+        self.msgID = 123
 
     def update(self):
-        if not self.initialized:
+        if (bool(self.State) and not self.initialized):
             logging.info('@UPDATE First run I=%s\n', self.name)
             self.initialized = True
-            self.State = self.getState() #populate State, so we can set it.
+            #self.State = self.getState() #populate State, so we can set it.
+            logging.info('@UPDATE: self.State: %s', self.State)
             for index, item in enumerate(self.State):
                 logging.info("@UPDATE name:%s, index:%s, seg:%s", self.name, index, item)
                 if index in (0, 3):
@@ -55,15 +58,15 @@ class Intersection_Component(Component):
                 else:
                      self.setState(item, "Green", "Red")
             self.clock = time()
-
-        if True == self.controllor():
-            self.switchState()
-            self.clock = time()
+        elif (not self.initialized):
+            logging.info("Waiting for server")
         else:
-            self.keepState()
-            #self.clock += 1
-        #self.simStep(self.statesList[self.currentIdx])
-
+            if True == self.controllor():
+                self.switchState()
+                self.clock = time()
+            else:
+                self.keepState()
+        '''
         #NEED SOME WAY TO FIGURE OUT WHO NEIGHBORS ARE
         NQ_data ={
                     'Intersection': int(self.name),
@@ -101,6 +104,7 @@ class Intersection_Component(Component):
         self.publisher("pushWQ").send(WQ_data_string)
         #print "pushed"
         #print self.name
+        '''
 
     def controllor(self):
         currentState = self.statesList[self.currentIdx]
@@ -119,10 +123,8 @@ class Intersection_Component(Component):
         logging.debug('@controllor %s state:\n%s', self.name, self.State)
         for idx, i in enumerate(self.State):
             if (self.State[i]['vehicle']) == 'Green':
-                self.Qs[idx] = self.getDensity(i)
                 GreenQ += self.Qs[idx] + int(self.neighbors[idx]*.3)
             elif (self.State[i]['vehicle']) == 'Red':
-                self.Qs[idx] = self.getDensity(i)
                 redQ += self.Qs[idx] + int(self.neighbors[idx]*.3)
             else:
                 assert False
@@ -148,7 +150,7 @@ class Intersection_Component(Component):
 
     def switchState(self):
         logging.debug("SWITCHING STATE")
-        self.State = self.getState()
+        #self.State = self.getState()
 
       #The state has a min/max time and queue length for state. State is 1 or 2
         self.currentIdx = (self.currentIdx + 1) % len(self.statesList)
@@ -164,34 +166,13 @@ class Intersection_Component(Component):
                 self.setState(i, "Green", "Red")
             else:
                 assert False
-        '''
-        if (self.State[self.prefix+str(0)]['vehicle'] == 'Green'):
-            self.setState(self.prefix+str(0), "Red", "Red")
-            self.setState(self.prefix+str(3), "Red", "Red")
-            self.setState(self.prefix+str(1), "Green", "Red")
-            self.setState(self.prefix+str(2), "Green", "Red")
 
-        else:
-            self.setState(self.prefix+str(0), "Green", "Red")
-            self.setState(self.prefix+str(3), "Green", "Red")
-            self.setState(self.prefix+str(1), "Red", "Red")
-            self.setState(self.prefix+str(2), "Red", "Red")
-        '''
         print "\n"
         logging.info("@SWITCHSTATE--- %s---: NEW STATE: \n %s \n",self.name, pprint.pformat(self.State))
 
 
     def keepState(self):
         pass
-
-    # def simStep(self, currentState):
-    #     for i in xrange(len(currentState)):
-    #         if '2' == currentState[i]:
-    #             self.Qs[i] += randint(0, 1)
-    #         elif '0' == currentState[i]:
-    #             self.Qs[i] += randint(-self.Qs[i], 1)
-    #         else:
-    #             assert False
 
     def coordinate(self, msg, segment):
         #segment is which port received the message
@@ -207,9 +188,6 @@ class Intersection_Component(Component):
             self.neighbors[3] = int(data['QDensity'])
         else:
             assert False
-        #{State, Intersection, Segment, QDensity}
-        #pp.pprint(msg + segment)
-        #print (self.neighbors)
 
     def coordinateN(self, msg):
         self.coordinate(msg, "N")
@@ -220,117 +198,25 @@ class Intersection_Component(Component):
     def coordinateW(self, msg):
         self.coordinate(msg, "W")
 
-        #print str(self.name) + " N segment received " + msg
-        #pp.pprint(self.__dict__)
-        #pp.pprint("message" + msg)
+    def subState(self, message):
+        logging.info("@subState: message recieved: %s", message)
+        self.State = json.loads(message)
 
-    def getState(self):
-        logging.debug('@GETSTATE node: %s\n', self.name)
-        data = {
-                'Method': 'GETSTATE',
-                'Object': {
-                	       'Name': 'NodeId',
-                           'Type': 'PARAMETER',
-                           'Value': self.name,  #// should be 0 - 3 (for the selected Intersection)
-                           'ValueType': 'System.UInt32'
-                           }
-               }
-        data_string = json.dumps(data)
-        logging.debug("@GETSTATE %s before send", self.name)
-        response = self.client("getState_port").call(data_string)
-        logging.debug("@GETSTATE %s after send\n", self.name)
-        state = json.loads(response)
-        logging.debug("@GETSTATE: Response from simulator: \n %s\n", pprint.pformat(state))
-        return state
-
-    def getDensity(self, segment):
-        data = {
-                'Method': 'GETDENSITY',
-                'Object':{
-                            'Name': 'NodeId',
-                        	'Type': 'PARAMETER',
-                        	'Value': int(self.name),  #// should be 0 - 3 (for the selected ids)
-                        	'ValueType': 'System.UInt32',
-                        	'Parameters':
-                            [
-                        	    {
-                        		'Name': 'SegmentId',
-                        		'Type': 'PARAMETER',
-                        		'Value': segment[-1],
-                        		'ValueType': 'System.UInt32'
-                        	    }
-                            ]
-                         }
-                }
-        data_string = json.dumps(data)
-        logging.debug('@getDensity before send')
-        response = self.client("getDensity_port").call(data_string)
-        logging.debug('@getDensity, after send\n')
-        logging.debug('@getDensity name=%s, Seg=%s; density: %s', self.name, segment[-1], response)
-        if type(response) not in (int, str):
-            print "\n\n"
-
-            logging.error(
-"\n ------@GETDENSITY RECEIVED BAD MESSAGE-----:\n \
-_____________________________________________\n \
-%s, type:%s \n\n", response, type(response))
-
-            density = int(self.getDensity(segment))
-            return density;
-        else:
-            density = int(response)
-            return density;
+    def subDensity(self, message):
+        logging.info("@subDensity: message recieved: %s", message)
+        self.Qs = json.loads(message)
 
     def setState(self, segment, vehicleState, pedestrianState ):
         self.State[segment]['vehicle'] = vehicleState
         self.State[segment]['pedestrian'] = pedestrianState
         logging.info('@SETSTATE name:%s, seg:%s, state:\n%s\n', self.name, segment[-1], pprint.pformat(self.State))
-        data = {
-                'Method': 'SETSTATE',
-                'Object':
-                            {
-                            'Name': 'NodeId',
-                            'Type': 'PARAMETER',
-                            'Value': int(self.name),  #// should be 0 - 3 (for the selected ids)
-                            'ValueType': 'System.UInt32',
-                            'Parameters':
-                                        [
-                                            {
-                                            'Name': 'SegmentId',
-                                            'Type': 'PARAMETER',
-                                            'Value': segment[-1],
-                                            'ValueType': 'System.UInt32'	    },
-                                            {
-                                            'Name': 'VehicleState',
-                                            'Type': 'PARAMETER',
-                                            'Value': vehicleState,
-                                            'ValueType': 'System.String'	    },
-                                    	    {
-                                    		'Name': 'PedestrianState',
-                                    		'Type': 'PARAMETER',
-                                    		'Value': 'Red',
-                                    		'ValueType': 'System.String'
-                                    	    }
-	                                    ]
-                            }
-                }
-        data_string = json.dumps(data)
-	#print data_string
-        logging.debug('@SETSTATE name:%s seg:%s before send\n', self.name, segment[-1])
-        response = self.client("setState_port").call(data_string)
-        logging.debug('@SETSTATE name:%s seg:%s after send\n', self.name, segment[-1])
-	#print response
-        #response = "ACK"
-        #return response
 
-    def send(self, data_string):
-        self.sock.settimeout(1) #need this in case of message loss
-        self.sock.sendto(data_string, ("192.168.0.111",11000))
-        #logging.debug('@send, I: %s, msg: %s\n', self.name, pprint.pformat(data_string))
-        try:
-            response, srvr = self.sock.recvfrom(1024)
-            #logging.debug('@send, response: %s', response )
-        except socket.timeout:
-            logging.error('Request timed out')
-            response =  0
-        return response
+        msg = {
+                'segment' : segment,
+                'vehicleState' : vehicleState,
+                'pedestrianState' : pedestrianState
+        }
+
+        msg_string = json.dumps(msg)
+        response = self.client("setState_port").call(msg_string)
+        logging.info('name:%s response:%s', self.name, response)

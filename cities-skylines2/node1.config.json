@@ -50,62 +50,79 @@
             "Endpoints" : ["tcp://192.168.0.110:5003"]
         }
       ],
-
       "Clients" : [
-        {
-          "Name" : "getState_port",
-          "Endpoints" : ["tcp://127.0.0.1:7000"]
-        },
-        {
-          "Name" : "getDensity_port",
-          "Endpoints" : ["tcp://127.0.0.1:7001"]
-        },
         {
           "Name" : "setState_port",
           "Endpoints" : ["tcp://127.0.0.1:7002"]
         }
+      ],
+
+      "Subscribers" : [
+        {
+          "Name" : "state_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subState",
+          "Endpoints" : ["tcp://127.0.0.1:7100"]
+        },
+        {
+          "Name" : "density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subDensity",
+          "Endpoints" : ["tcp://127.0.0.1:7101"]
+        }
       ]
     },
 
-
     {
-      "Name" : "setState_component",
+      "Name" : "setState_component0",
 	    "Definition" : "simserver_component.simServer_Component",
 
 	    "Servers" : [
         {
           "Name" : "setState_port",
           "Priority" : 60,
-          "Function" : "send",
+          "Function" : "setState",
           "Endpoints" : ["tcp://*:7002"]
         }
       ]
     },
 
     {
-      "Name" : "getState_component",
-	    "Definition" : "simserver_component.simServer_Component",
-
-	    "Servers" : [
+      "Name" : "getState_component0",
+      "Definition" : "simserver_component.simServer_Component",
+      "Timers" : [
         {
-          "Name" : "getState_port",
-          "Priority" : 60,
-          "Function" : "send",
-          "Endpoints" : ["tcp://*:7000"]
+          "Name" : "timer",
+          "Priority" : 50,
+          "Period" : 0.5,
+          "Function": "pubState"
+        }
+      ],
+      "Publishers" : [
+        {
+          "Name" : "statePublisher",
+          "Endpoints" : ["tcp://*:7100"]
         }
       ]
     },
 
     {
-      "Name" : "getDensity_component",
+      "Name" : "getDensity_component0",
 	    "Definition" : "simserver_component.simServer_Component",
-
-	    "Servers" : [
+      "Timers" : [
         {
-          "Name" : "getDensity_port",
-          "Priority" : 60,
-          "Function" : "send",
-          "Endpoints" : ["tcp://*:7001"]
+          "Name" : "timer",
+          "Priority" : 50,
+          "Period" : 0.5,
+          "Function": "pubDensity"
+        }
+      ],
+	    "Publishers" : [
+        {
+          "Name" : "densityPublisher",
+          "Endpoints" : ["tcp://*:7101"]
         }
       ]
     }
