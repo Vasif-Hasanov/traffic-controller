@@ -32,10 +32,10 @@ class Intersection_Component(Component):
         self.ServerState = {}
         self.register_timer_operation("update", self.update)
         #register subscriber function
-        self.register_subscriber_operation("coordinateN", self.coordinateN)
-        self.register_subscriber_operation("coordinateE", self.coordinateE)
-        self.register_subscriber_operation("coordinateS", self.coordinateS)
-        self.register_subscriber_operation("coordinateW", self.coordinateW)
+        self.register_subscriber_operation("coordinateQN", self.coordinateQN)
+        self.register_subscriber_operation("coordinateQE", self.coordinateQE)
+        self.register_subscriber_operation("coordinateQS", self.coordinateQS)
+        self.register_subscriber_operation("coordinateQW", self.coordinateQW)
         self.register_subscriber_operation("subState", self.subState)
         self.register_subscriber_operation("subDensity", self.subDensity)
         #self.sensors = ['N', 'E', 'S', 'W']
@@ -77,25 +77,25 @@ class Intersection_Component(Component):
         '''
         #NEED SOME WAY TO FIGURE OUT WHO NEIGHBORS ARE
         NQ_data ={
-                    'Intersection': int(self.name),
+                    'Intersection': int(self.name[-1]),
                     'Segment': "NQ",
                     'QDensity': self.Qs[0],
                     'State': self.statesList[self.currentIdx]
                 }
         EQ_data ={
-                    'Intersection': int(self.name),
+                    'Intersection': int(self.name[-1]),
                     'Segment': "EQ",
                     'QDensity': self.Qs[1],
                     'State': self.statesList[self.currentIdx]
                 }
         WQ_data ={
-                    'Intersection': int(self.name),
+                    'Intersection': int(self.name[-1]),
                     'Segment': "WQ",
                     'QDensity': self.Qs[2],
                     'State': self.statesList[self.currentIdx]
                 }
         SQ_data ={
-                    'Intersection': int(self.name),
+                    'Intersection': int(self.name[-1]),
                     'Segment': "SQ",
                     'QDensity': self.Qs[3],
                     'State': self.statesList[self.currentIdx]
@@ -188,7 +188,7 @@ class Intersection_Component(Component):
     def keepState(self):
         pass
 
-    def coordinate(self, msg, segment):
+    def coordinateQ(self, msg, segment):
         #segment is which port received the message
         #(compare states)
         data = json.loads(msg)
@@ -203,14 +203,14 @@ class Intersection_Component(Component):
         else:
             assert False
 
-    def coordinateN(self, msg):
-        self.coordinate(msg, "N")
-    def coordinateE(self, msg):
-        self.coordinate(msg, "E")
-    def coordinateS(self, msg):
-        self.coordinate(msg, "S")
-    def coordinateW(self, msg):
-        self.coordinate(msg, "W")
+    def coordinateQN(self, msg):
+        self.coordinateQ(msg, "N")
+    def coordinateQE(self, msg):
+        self.coordinateQ(msg, "E")
+    def coordinateQS(self, msg):
+        self.coordinateQ(msg, "S")
+    def coordinateQW(self, msg):
+        self.coordinateQ(msg, "W")
 
     def subState(self, message):
         logging.debug("@subState: message recieved: %s", message)

@@ -16,7 +16,7 @@
           "Name": "QE",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateE",
+          "Function" : "coordinateQE",
           "Endpoints": ["tcp://127.0.0.1:5010",
                         "tcp://127.0.0.1:5011",
                         "tcp://127.0.0.1:5012"
@@ -26,7 +26,7 @@
           "Name": "QS",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateS",
+          "Function" : "coordinateQS",
           "Endpoints": ["tcp://127.0.0.1:5021",
                         "tcp://127.0.0.1:5022",
                         "tcp://127.0.0.1:5023"]
@@ -141,7 +141,7 @@
           "Name": "QW",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateW",
+          "Function" : "coordinateQW",
           "Endpoints": ["tcp://127.0.0.1:5000",
                         "tcp://127.0.0.1:5002",
                         "tcp://127.0.0.1:5003"]
@@ -150,7 +150,7 @@
           "Name": "QS",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateS",
+          "Function" : "coordinateQS",
           "Endpoints": ["tcp://127.0.0.1:5031",
                         "tcp://127.0.0.1:5032",
                         "tcp://127.0.0.1:5033"]
@@ -266,7 +266,7 @@
           "Name": "QN",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateN",
+          "Function" : "coordinateQN",
           "Endpoints": ["tcp://127.0.0.1:5000",
                         "tcp://127.0.0.1:5001",
                         "tcp://127.0.0.1:5003"]
@@ -275,7 +275,7 @@
           "Name": "QE",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateE",
+          "Function" : "coordinateQE",
           "Endpoints": ["tcp://127.0.0.1:5030",
                         "tcp://127.0.0.1:5031",
                         "tcp://127.0.0.1:5032"]
@@ -391,7 +391,7 @@
           "Name": "QW",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateW",
+          "Function" : "coordinateQW",
           "Endpoints": ["tcp://127.0.0.1:5020",
                         "tcp://127.0.0.1:5022",
                         "tcp://127.0.0.1:5023"]
@@ -400,7 +400,7 @@
           "Name": "QN",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateN",
+          "Function" : "coordinateQN",
           "Endpoints": ["tcp://127.0.0.1:5010",
                         "tcp://127.0.0.1:5011",
                         "tcp://127.0.0.1:5013"]
