@@ -17,19 +17,19 @@
           "Priority" : 60,
           "Filter" : "",
           "Function" : "coordinateQE",
-          "Endpoints": ["tcp://127.0.0.1:5010",
-                        "tcp://127.0.0.1:5011",
-                        "tcp://127.0.0.1:5012"
+          "Endpoints": ["tcp://127.0.0.1:5030",
+                        "tcp://127.0.0.1:5031",
+                        "tcp://127.0.0.1:5032"
                         ]
         },
         {
-          "Name": "QS",
+          "Name": "QN",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "coordinateQS",
-          "Endpoints": ["tcp://127.0.0.1:5021",
-                        "tcp://127.0.0.1:5022",
-                        "tcp://127.0.0.1:5023"]
+          "Endpoints": ["tcp://127.0.0.1:5010",
+                        "tcp://127.0.0.1:5011",
+                        "tcp://127.0.0.1:5013"]
         }
       ],
       "Publishers" :[
@@ -53,7 +53,7 @@
       "Clients" : [
         {
           "Name" : "setState_port",
-          "Endpoints" : ["tcp://127.0.0.1:7002"]
+          "Endpoints" : ["tcp://127.0.0.1:7001"]
         }
       ],
       "Subscribers" : [
@@ -62,14 +62,14 @@
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7100"]
+          "Endpoints" : ["tcp://127.0.0.1:7000"]
         },
         {
           "Name" : "density_sub",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7101"]
+          "Endpoints" : ["tcp://127.0.0.1:7100"]
         }
       ]
     },
@@ -82,7 +82,7 @@
           "Name" : "setState_port",
           "Priority" : 60,
           "Function" : "setState",
-          "Endpoints" : ["tcp://*:7002"]
+          "Endpoints" : ["tcp://*:7001"]
         }
       ]
     },
@@ -101,7 +101,7 @@
       "Publishers" : [
         {
           "Name" : "statePublisher",
-          "Endpoints" : ["tcp://*:7100"]
+          "Endpoints" : ["tcp://*:7000"]
         }
       ]
     },
@@ -120,7 +120,7 @@
 	    "Publishers" : [
         {
           "Name" : "densityPublisher",
-          "Endpoints" : ["tcp://*:7101"]
+          "Endpoints" : ["tcp://*:7100"]
         }
       ]
     },
@@ -138,22 +138,22 @@
       ],
       "Subscribers" : [
         {
-          "Name": "QW",
+          "Name": "QE",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateQW",
-          "Endpoints": ["tcp://127.0.0.1:5000",
-                        "tcp://127.0.0.1:5002",
-                        "tcp://127.0.0.1:5003"]
+          "Function" : "coordinateQE",
+          "Endpoints": ["tcp://127.0.0.1:5020",
+                        "tcp://127.0.0.1:5021",
+                        "tcp://127.0.0.1:5022"]
         },
         {
           "Name": "QS",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "coordinateQS",
-          "Endpoints": ["tcp://127.0.0.1:5031",
-                        "tcp://127.0.0.1:5032",
-                        "tcp://127.0.0.1:5033"]
+          "Endpoints": ["tcp://127.0.0.1:5001",
+                        "tcp://127.0.0.1:5002",
+                        "tcp://127.0.0.1:5003"]
         }
       ],
       "Publishers" :[
@@ -177,7 +177,7 @@
       "Clients" : [
         {
           "Name" : "setState_port",
-          "Endpoints" : ["tcp://127.0.0.1:7012"]
+          "Endpoints" : ["tcp://127.0.0.1:7011"]
         }
       ],
 
@@ -187,14 +187,14 @@
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7110"]
+          "Endpoints" : ["tcp://127.0.0.1:7010"]
         },
         {
           "Name" : "density_sub",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7111"]
+          "Endpoints" : ["tcp://127.0.0.1:7110"]
         }
       ]
     },
@@ -207,7 +207,7 @@
           "Name" : "setState_port",
           "Priority" : 60,
           "Function" : "setState",
-          "Endpoints" : ["tcp://*:7012"]
+          "Endpoints" : ["tcp://*:7011"]
         }
       ]
     },
@@ -226,7 +226,7 @@
       "Publishers" : [
         {
           "Name" : "statePublisher",
-          "Endpoints" : ["tcp://*:7110"]
+          "Endpoints" : ["tcp://*:7010"]
         }
       ]
     },
@@ -245,7 +245,7 @@
 	    "Publishers" : [
         {
           "Name" : "densityPublisher",
-          "Endpoints" : ["tcp://*:7111"]
+          "Endpoints" : ["tcp://*:7110"]
         }
       ]
     },

@@ -8,7 +8,7 @@ import json
 from time import time
 import socket
 import logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 
 class Intersection_Component(Component):
@@ -17,10 +17,10 @@ class Intersection_Component(Component):
         print("initialize")
         Component.__init__(self)
         #queue parameters
-        self.Qs = [randint(0,2) for i in xrange(4)] #[N E S W]
+        self.Qs = [0 for i in xrange(4)] #[N E S W]
         self.neighbors = [0, 0, 0, 0]
-        self.minInterval = [5, 5]#stay in state at least 20s
-        self.maxInterval = [20, 20]#don't stay longer than 60s in state1/80s in state 2
+        self.minInterval = [5, 5]#seconds to stay in states
+        self.maxInterval = [20, 20]#do not exceed seconds in state
         self.threshold1 = [20, 20] #if density % is lower don't switch
         self.threshold2 = [40, 40] #if density % if higher don't switch
         self.statesList = ['1', '2']
@@ -74,7 +74,19 @@ class Intersection_Component(Component):
                 self.clock = time()
             else:
                 self.keepState()
-        '''
+
+        #$$$$  1  $$$$$  1  $$$$
+        #$$$$     $$$$$     $$$$
+        #   2  1  3   2  2  3
+        #$$$$     $$$$$     $$$$
+        #$$$$  0  $$$$$  0  $$$$
+        #$$$$     $$$$$     $$$$
+        #$$$$  1  $$$$$  1  $$$$
+        #$$$$     $$$$$     $$$$
+        #   2  0  3   2  3  3
+        #$$$$     $$$$$     $$$$
+        #$$$$  0  $$$$$  0  $$$$
+
         #NEED SOME WAY TO FIGURE OUT WHO NEIGHBORS ARE
         NQ_data ={
                     'Intersection': int(self.name[-1]),
@@ -88,15 +100,15 @@ class Intersection_Component(Component):
                     'QDensity': self.Qs[1],
                     'State': self.statesList[self.currentIdx]
                 }
-        WQ_data ={
-                    'Intersection': int(self.name[-1]),
-                    'Segment': "WQ",
-                    'QDensity': self.Qs[2],
-                    'State': self.statesList[self.currentIdx]
-                }
         SQ_data ={
                     'Intersection': int(self.name[-1]),
                     'Segment': "SQ",
+                    'QDensity': self.Qs[2],
+                    'State': self.statesList[self.currentIdx]
+                }
+        WQ_data ={
+                    'Intersection': int(self.name[-1]),
+                    'Segment': "WQ",
                     'QDensity': self.Qs[3],
                     'State': self.statesList[self.currentIdx]
                 }
@@ -112,7 +124,6 @@ class Intersection_Component(Component):
         self.publisher("pushWQ").send(WQ_data_string)
         #print "pushed"
         #print self.name
-        '''
 
     def controllor(self):
         currentState = self.statesList[self.currentIdx]
@@ -129,21 +140,13 @@ class Intersection_Component(Component):
         redQ = 0
         GreenQ = 0
         logging.debug('@controllor %s state:\n%s', self.name, self.State)
-        for idx, i in enumerate(self.State):
-            if (self.State[i]['vehicle']) == 'Green':
-                GreenQ += self.Qs[idx] + int(self.neighbors[idx]*.3)
+        for index, item in enumerate(self.State):
+            if (self.State[item]['vehicle']) == 'Green':
+                GreenQ += self.Qs[index] + int(self.neighbors[index]*.3)
             elif (self.State[i]['vehicle']) == 'Red':
-                redQ += self.Qs[idx] + int(self.neighbors[idx]*.3)
+                redQ += self.Qs[index] + int(self.neighbors[index]*.3)
             else:
                 assert False
-
-        # for i in xrange(len(currentState)):
-        #     if '2' == currentState[i]:
-        #         redQ += self.Qs[i]
-        #     elif '0' == currentState[i]:
-        #         GreenQ += self.Qs[i]
-        #     else:
-        #         assert False
 
         if redQ <= self.threshold1[self.currentIdx]:
             #print "redQ", redQ
@@ -193,6 +196,7 @@ class Intersection_Component(Component):
         #(compare states)
         data = json.loads(msg)
         if segment == "N":
+            pp.pprint("name:%s message:%s", self.name, data)
             self.neighbors[0] = int(data['QDensity'])
         elif segment == "E":
             self.neighbors[1] = int(data['QDensity'])
@@ -221,7 +225,11 @@ class Intersection_Component(Component):
 
     def subDensity(self, message):
         logging.debug("@subDensity: message recieved: %s", message)
-        self.Qs = json.loads(message)
+        temp = json.loads(message)
+        self.Qs[0] = temp[1] #Segid for north queue is 1
+        self.Qs[1] = temp[3] #Segid for east queue is 3
+        self.Qs[2] = temp[0] #Segid for south queue is 0
+        self.Qs[3] = temp[2] #Segid for west  queue is 2
 
     def setState(self):
         logging.debug('@SETSTATE name:%s state:\n%s\n', self.name, pprint.pformat(self.State))
