@@ -8,7 +8,7 @@ import json
 from time import time
 import socket
 import logging
-logging.basicConfig(level=logging.WARNING)
+logging.basicConfig(level=logging.INFO)
 
 
 class Intersection_Component(Component):
@@ -113,7 +113,11 @@ class Intersection_Component(Component):
                     'State': self.statesList[self.currentIdx]
                 }
 
+        #logging.info("NQ_data: %s", pprint.pformat(NQ_data))
+
         NQ_data_string = json.dumps(NQ_data)
+        self.publisher("pushNQ").send(NQ_data_string)
+        """
         EQ_data_string = json.dumps(EQ_data)
         SQ_data_string = json.dumps(SQ_data)
         WQ_data_string = json.dumps(WQ_data)
@@ -122,6 +126,8 @@ class Intersection_Component(Component):
         self.publisher("pushEQ").send(EQ_data_string)
         self.publisher("pushSQ").send(SQ_data_string)
         self.publisher("pushWQ").send(WQ_data_string)
+        """
+        #logging.info("@UPDATE name:%s sending Q data", self.name)
         #print "pushed"
         #print self.name
 
@@ -143,7 +149,7 @@ class Intersection_Component(Component):
         for index, item in enumerate(self.State):
             if (self.State[item]['vehicle']) == 'Green':
                 GreenQ += self.Qs[index] + int(self.neighbors[index]*.3)
-            elif (self.State[i]['vehicle']) == 'Red':
+            elif (self.State[item]['vehicle']) == 'Red':
                 redQ += self.Qs[index] + int(self.neighbors[index]*.3)
             else:
                 assert False
@@ -195,8 +201,8 @@ class Intersection_Component(Component):
         #segment is which port received the message
         #(compare states)
         data = json.loads(msg)
+        logging.info("@--coordinateQ--: name: %s segment: %s data:%s", self.name, segment, pprint.pformat(data))
         if segment == "N":
-            pp.pprint("name:%s message:%s", self.name, data)
             self.neighbors[0] = int(data['QDensity'])
         elif segment == "E":
             self.neighbors[1] = int(data['QDensity'])
@@ -220,11 +226,11 @@ class Intersection_Component(Component):
         logging.debug("@subState: message recieved: %s", message)
         self.ServerState = json.loads(message)
         print "\n"
-        logging.info('@SUBSTATE name:%s, serverState:\n %s', self.name, pprint.pformat(self.ServerState))
+        logging.debug('@SUBSTATE name:%s, serverState:\n %s', self.name, pprint.pformat(self.ServerState))
         print "\n"
 
     def subDensity(self, message):
-        logging.debug("@subDensity: message recieved: %s", message)
+        logging.info("@subDensity name:%s message recieved: %s", self.name, message)
         temp = json.loads(message)
         self.Qs[0] = temp[1] #Segid for north queue is 1
         self.Qs[1] = temp[3] #Segid for east queue is 3
@@ -236,4 +242,4 @@ class Intersection_Component(Component):
 
         msg_string = json.dumps(self.State)
         response = self.client("setState_port").call(msg_string)
-        logging.info('name:%s response:%s', self.name, response)
+        logging.debug('name:%s response:%s', self.name, response)

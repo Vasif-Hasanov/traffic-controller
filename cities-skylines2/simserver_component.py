@@ -170,7 +170,7 @@ class simServer_Component(Component):
         else:
             logging.debug("publish Density")
             for index, item in enumerate(self.State):
-                logging.debug("@pubDensity item:%s index:%s", item, index)
+                logging.info("@pubDensity item:%s index:%s", item, index)
                 seg = int(item[-1])
                 self.Density[seg] = self.getDensity(seg)
 

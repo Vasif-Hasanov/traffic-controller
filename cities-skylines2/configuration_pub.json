@@ -30,6 +30,20 @@
           "Endpoints": ["tcp://127.0.0.1:5010",
                         "tcp://127.0.0.1:5011",
                         "tcp://127.0.0.1:5013"]
+        },
+        {
+          "Name" : "state_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subState",
+          "Endpoints" : ["tcp://127.0.0.1:7000"]
+        },
+        {
+          "Name" : "density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subDensity",
+          "Endpoints" : ["tcp://127.0.0.1:7100"]
         }
       ],
       "Publishers" :[
@@ -54,22 +68,6 @@
         {
           "Name" : "setState_port",
           "Endpoints" : ["tcp://127.0.0.1:7001"]
-        }
-      ],
-      "Subscribers" : [
-        {
-          "Name" : "state_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7000"]
-        },
-        {
-          "Name" : "density_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7100"]
         }
       ]
     },
@@ -154,6 +152,20 @@
           "Endpoints": ["tcp://127.0.0.1:5001",
                         "tcp://127.0.0.1:5002",
                         "tcp://127.0.0.1:5003"]
+        },
+        {
+          "Name" : "state_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subState",
+          "Endpoints" : ["tcp://127.0.0.1:7010"]
+        },
+        {
+          "Name" : "density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subDensity",
+          "Endpoints" : ["tcp://127.0.0.1:7110"]
         }
       ],
       "Publishers" :[
@@ -179,23 +191,6 @@
           "Name" : "setState_port",
           "Endpoints" : ["tcp://127.0.0.1:7011"]
         }
-      ],
-
-      "Subscribers" : [
-        {
-          "Name" : "state_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7010"]
-        },
-        {
-          "Name" : "density_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7110"]
-        }
       ]
     },
     {
@@ -211,7 +206,6 @@
         }
       ]
     },
-
     {
       "Name" : "getState_component1",
       "Definition" : "simserver_component.simServer_Component",
@@ -279,6 +273,20 @@
           "Endpoints": ["tcp://127.0.0.1:5033",
                         "tcp://127.0.0.1:5031",
                         "tcp://127.0.0.1:5032"]
+        },
+        {
+          "Name" : "state_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subState",
+          "Endpoints" : ["tcp://127.0.0.1:7020"]
+        },
+        {
+          "Name" : "density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subDensity",
+          "Endpoints" : ["tcp://127.0.0.1:7120"]
         }
       ],
       "Publishers" :[
@@ -303,23 +311,6 @@
         {
           "Name" : "setState_port",
           "Endpoints" : ["tcp://127.0.0.1:7021"]
-        }
-      ],
-
-      "Subscribers" : [
-        {
-          "Name" : "state_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7020"]
-        },
-        {
-          "Name" : "density_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7120"]
         }
       ]
     },
@@ -404,6 +395,20 @@
           "Endpoints": ["tcp://127.0.0.1:5020",
                         "tcp://127.0.0.1:5021",
                         "tcp://127.0.0.1:5023"]
+        },
+        {
+          "Name" : "state_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subState",
+          "Endpoints" : ["tcp://127.0.0.1:7030"]
+        },
+        {
+          "Name" : "density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subDensity",
+          "Endpoints" : ["tcp://127.0.0.1:7130"]
         }
       ],
       "Publishers" :[
@@ -428,23 +433,6 @@
         {
           "Name" : "setState_port",
           "Endpoints" : ["tcp://127.0.0.1:7031"]
-        }
-      ],
-
-      "Subscribers" : [
-        {
-          "Name" : "state_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7030"]
-        },
-        {
-          "Name" : "density_sub",
-          "Priority" : 60,
-          "Filter" : "",
-          "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7130"]
         }
       ]
     },
