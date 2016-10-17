@@ -13,28 +13,42 @@
       ],
       "Subscribers" : [
         {
-          "Name": "Q1",
+          "Name": "NIC_density_sub",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateQ1",
-          "Endpoints": ["Q1endpoints"]
+          "Function" : "subNIC",
+          "Endpoints": ["NICendpoint"]
         },
         {
-          "Name": "Q2",
+          "Name": "EIC_density_sub",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateQ2",
-          "Endpoints": ["Q2endpoints"]
+          "Function" : "subEIC",
+          "Endpoints": ["EICendpoint"]
         },
         {
-          "Name" : "state_sub",
+          "Name": "SIC_density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subSIC",
+          "Endpoints": ["SICendpoint"]
+        },
+        {
+          "Name": "WIC_density_sub",
+          "Priority" : 60,
+          "Filter" : "",
+          "Function" : "subWIC",
+          "Endpoints": ["WICendpoint"]
+        },
+        {
+          "Name" : "internal_light_state_sub",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subState",
           "Endpoints" : ["tcp://127.0.0.1:7000"]
         },
         {
-          "Name" : "density_sub",
+          "Name" : "internal_density_sub",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subDensity",
@@ -43,38 +57,26 @@
       ],
       "Publishers" :[
         {
-          "Name" : "pushNQ",
+          "Name" : "density_pub",
             "Endpoints" : ["tcp://*:5000"]
-        },
-        {
-          "Name" : "pushEQ",
-          "Endpoints" : ["tcp://*:5001"]
-        },
-        {
-          "Name" : "pushSQ",
-          "Endpoints" : ["tcp://*:5002"]
-        },
-        {
-          "Name" : "pushWQ",
-            "Endpoints" : ["tcp://*:5003"]
         }
       ],
 
       "Clients" : [
         {
-          "Name" : "setState_port",
+          "Name" : "internal_setLightState_client",
           "Endpoints" : ["tcp://127.0.0.1:7001"]
         }
       ]
     },
 
     {
-      "Name" : "setState_component0",
-	    "Definition" : "simserver_component.simServer_Component",
+      "Name" : "setLightActuator0",
+	    "Definition" : "interfaceIC.IFIC",
 
 	    "Servers" : [
         {
-          "Name" : "setState_port",
+          "Name" : "internal_setLightState_server",
           "Priority" : 60,
           "Function" : "setState",
           "Endpoints" : ["tcp://*:7001"]
@@ -83,8 +85,8 @@
     },
 
     {
-      "Name" : "getState_component0",
-      "Definition" : "simserver_component.simServer_Component",
+      "Name" : "lightSensor0",
+      "Definition" : "interfaceIC.IFIC",
       "Timers" : [
         {
           "Name" : "timer",
