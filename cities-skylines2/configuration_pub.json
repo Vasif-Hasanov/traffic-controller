@@ -26,7 +26,7 @@
           "Name": "QN",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "coordinateQS",
+          "Function" : "coordinateQN",
           "Endpoints": ["tcp://127.0.0.1:5010",
                         "tcp://127.0.0.1:5011",
                         "tcp://127.0.0.1:5013"]

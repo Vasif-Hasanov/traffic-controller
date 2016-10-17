@@ -129,7 +129,7 @@ class simServer_Component(Component):
 
         data_string = json.dumps(data)
         response = self.send(data_string)
-        logging.info("@SETSTATE name:%s response:%s", self.name, response)
+        logging.debug("@SETSTATE name:%s response:%s", self.name, response)
         return "ACK"
 
     def pubState(self):
@@ -170,7 +170,7 @@ class simServer_Component(Component):
         else:
             logging.debug("publish Density")
             for index, item in enumerate(self.State):
-                logging.info("@pubDensity item:%s index:%s", item, index)
+                logging.debug("@pubDensity item:%s index:%s", item, index)
                 seg = int(item[-1])
                 self.Density[seg] = self.getDensity(seg)
 
@@ -205,9 +205,9 @@ class simServer_Component(Component):
                 density = json.loads(response)
                 return density
         else:
-            print "\n\n----------------------------------------"
+            #print "\n\n----------------------------------------"
             logging.error("Server not on. old density: %s", self.Density[seg])
-            print "\n\n----------------------------------------"
+            #print "\n\n----------------------------------------"
 
             return self.Density[seg]
 
