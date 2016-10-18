@@ -1,5 +1,6 @@
 #!/bin/bash
-export node0="bbb-bb19.local"
+#export node0="bbb-bb19.local"
+export node0="192.168.0.110" #bbb-bb19.local
 export n0="tcp:\/\/$node0"
 
 export node1="bbb-9178.local"

@@ -1,32 +1,45 @@
 from zcm import *
 import json
+import logging
+import socket
+import pprint
 
 
 class IFIC(Component):
     def __init__(self):
         """Register the server operation"""
         Component.__init__(self)
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
         self.register_timer_operation("pubGameLightState", self.pubGameLightState)
         self.register_timer_operation("pubGameDensity", self.pubGameDensity)
-        self.IC = self.name[-1] #NodeId
+
+        self.register_server_operation("setGameLightState", self.setGameLightState)
 
     def pubGameLightState(self):
-        LightState = send2Game(getLightState(self.IC))
-        self.publisher("game_lightState_pub").send(json.dumps(LigLightState))
+        IC = self.name[-1]
+        lightState = self.send2Game(self.getLightState(IC))
+        self.publisher("game_lightState_pub").send(json.dumps(lightState))
 
     def pubGameDensity(self):
-        gameDensity = send2Game(getDensity(self.IC))
+        IC = self.name[-1]
+        gameDensity = self.send2Game(self.getDensities(IC))
         self.publisher("game_density_pub").send(json.dumps(gameDensity))
 
-    def send2Game(msg):
+    def setGameLightState(self, msg_string):
+        IC = self.name[-1]
+        state = json.loads(msg_string)
+        rep = self.send2Game(self.setLightState_All(IC, state))
+        return json.dumps(rep)
+
+    def send2Game(self, msg):
         response = 0
-        sock.settimeout(1)
+        self.sock.settimeout(1)
         msg_string = json.dumps(msg)
         #sock.sendto(data_string, ("localhost", 11000))
-        sock.sendto(msg_string, ("192.168.0.111", 11000))
+        self.sock.sendto(msg_string, ("192.168.0.111", 11000))
         try:
-            response_str, srvr = sock.recvfrom(1024)
+            response_str, srvr = self.sock.recvfrom(1024)
             #logging.info("@SEND response_str: %s", pprint.pformat(response_str))
             response = json.loads(response_str)
 
@@ -35,7 +48,7 @@ class IFIC(Component):
             logging.warning('Request timed out')
         return response
 
-    def getLightState(IC):
+    def getLightState(self, IC):
         msg = {
         'Method': 'GETSTATE',
         'Object': {
@@ -45,10 +58,9 @@ class IFIC(Component):
                     'ValueType': 'System.UInt32'
                     }
         }
-        logging.debug('@GETSTATE msg: %s', pprint.pformat(msg))
         return msg;
 
-    def getDensities(IC):
+    def getDensities(self, IC):
         msg = {
                 'Method': 'GETDENSITIES',
                 'Object':{
@@ -88,7 +100,7 @@ class IFIC(Component):
                 }
         return msg;
 
-    def setLightState_All(IC, state):
+    def setLightState_All(self, IC, state):
         msg = {
                 'Method': 'SETSTATE',
                 'Object':

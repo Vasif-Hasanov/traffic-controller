@@ -41,14 +41,14 @@
           "Endpoints": ["WICendpoint"]
         },
         {
-          "Name" : "internal_light_state_sub",
+          "Name" : "subGameLightState",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subGameLight",
           "Endpoints" : ["lightSensor_port"]
         },
         {
-          "Name" : "internal_density_sub",
+          "Name" : "subGameDensity",
           "Priority" : 60,
           "Filter" : "",
           "Function" : "subGameDensity",
@@ -64,7 +64,7 @@
 
       "Clients" : [
         {
-          "Name" : "internal_setLightState_client",
+          "Name" : "setGameLightState_client",
           "Endpoints" : ["LightActuator_port"]
         }
       ]
@@ -76,16 +76,16 @@
 
 	    "Servers" : [
         {
-          "Name" : "internal_setLightState_server",
+          "Name" : "setGameLightState_server",
           "Priority" : 60,
-          "Function" : "setLightState",
+          "Function" : "setGameLightState",
           "Endpoints" : ["LightActuator_port"]
         }
       ]
     },
 
     {
-      "Name" : "lightSensor",
+      "Name" : "lightSensor0",
       "Definition" : "interfaceIC.IFIC",
       "Timers" : [
         {
