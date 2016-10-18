@@ -2,7 +2,7 @@
   "Component Instances": [
     {
       "Name" : "intersection_component0",
-      "Definition" : "intersection_component.Intersection_Component",
+      "Definition" : "intrscn_control.IC",
       "Timers" : [
         {
           "Name" : "timer",
@@ -44,80 +44,80 @@
           "Name" : "internal_light_state_sub",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "subState",
-          "Endpoints" : ["tcp://127.0.0.1:7000"]
+          "Function" : "subGameLight",
+          "Endpoints" : ["lightSensor_port"]
         },
         {
           "Name" : "internal_density_sub",
           "Priority" : 60,
           "Filter" : "",
-          "Function" : "subDensity",
-          "Endpoints" : ["tcp://127.0.0.1:7100"]
+          "Function" : "subGameDensity",
+          "Endpoints" : ["densitySensor_port"]
         }
       ],
       "Publishers" :[
         {
           "Name" : "density_pub",
-            "Endpoints" : ["tcp://*:5000"]
+            "Endpoints" : ["IC_densityPub_port"]
         }
       ],
 
       "Clients" : [
         {
           "Name" : "internal_setLightState_client",
-          "Endpoints" : ["tcp://127.0.0.1:7001"]
+          "Endpoints" : ["LightActuator_port"]
         }
       ]
     },
 
     {
-      "Name" : "setLightActuator0",
+      "Name" : "LightActuator0",
 	    "Definition" : "interfaceIC.IFIC",
 
 	    "Servers" : [
         {
           "Name" : "internal_setLightState_server",
           "Priority" : 60,
-          "Function" : "setState",
-          "Endpoints" : ["tcp://*:7001"]
+          "Function" : "setLightState",
+          "Endpoints" : ["LightActuator_port"]
         }
       ]
     },
 
     {
-      "Name" : "lightSensor0",
+      "Name" : "lightSensor",
       "Definition" : "interfaceIC.IFIC",
       "Timers" : [
         {
           "Name" : "timer",
           "Priority" : 50,
           "Period" : 0.5,
-          "Function": "pubState"
+          "Function": "pubGameLightState"
         }
       ],
       "Publishers" : [
         {
-          "Name" : "statePublisher",
-          "Endpoints" : ["tcp://*:7000"]
+          "Name" : "game_lightState_pub",
+          "Endpoints" : ["lightSensor_port"]
         }
       ]
     },
 
     {
-      "Name" : "getDensity_component0",
-	    "Definition" : "simserver_component.simServer_Component",
+      "Name" : "densitySensor0",
+	    "Definition" : "interfaceIC.IFIC",
       "Timers" : [
         {
           "Name" : "timer",
           "Priority" : 50,
           "Period" : 0.5,
-          "Function": "pubDensity"
+          "Function": "pubGameDensity"
         }
       ],
 	    "Publishers" : [
         {
-          "Name" : "densityPublisher",
-          "Endpoints" : ["tcp://*:7100"]
+          "Name" : "game_density_pub",
+          "Endpoints" : ["densitySensor_port"]
         }
       ]
     }
