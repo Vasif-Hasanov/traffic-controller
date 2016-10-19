@@ -139,10 +139,15 @@ class IC(Component):
         self.GameLightState = json.loads(message)
         logging.debug("@subGameLight IC:%s \nGameLightState:\n%s\n", self.name, pprint.pformat(self.GameLightState))
 
-    def subGameDensity(self, message):
-        self.Densities = json.loads(message)
-        logging.debug("@subGameDensity IC:%s gameDensity:%s\n", self.name, self.Densities)
+    def subGameDensity(self, msg_string):
+        msg = json.loads(msg_string)
+        logging.debug("@subGameDensity IC:%s gameDensity:%s\n", self.name, msg)
 
+        if type(msg) is not dict:
+            logging.error("Server error. old density: %s", self.Densities)
+            return -1
+
+        self.Densities = msg
         file_exists=os.path.isfile(self.name+".csv")
         with open(self.name+".csv", 'ab') as csvfile:
             fieldnames = self.cardDict.values()
