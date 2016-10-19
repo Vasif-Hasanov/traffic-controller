@@ -1,7 +1,7 @@
 {
   "Component Instances": [
     {
-      "Name" : "intersection_component0",
+      "Name" : "intersection_controller0",
       "Definition" : "intrscn_control.IC",
       "Timers" : [
         {
