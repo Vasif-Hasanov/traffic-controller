@@ -26,6 +26,7 @@ class IC(Component):
         self.LightState = {}
         self.Densities = {}
         self.initialized = False
+        self.ignoreDensities = False
         self.clock = time()
         self.minTime = 5
         self.maxTime = 20
@@ -73,6 +74,9 @@ class IC(Component):
         dT = time() - self.clock
         if dT >= self.maxTime:
             return True
+
+        if self.ignoreDensities:
+            return False
 
         if dT < self.minTime:
             return False
