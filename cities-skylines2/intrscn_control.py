@@ -4,6 +4,8 @@ import pprint
 import logging
 from time import time
 logging.basicConfig(level = logging.DEBUG)
+import csv
+import os.path
 
 class IC(Component):
     """Intersection controllor Component"""
@@ -140,6 +142,16 @@ class IC(Component):
     def subGameDensity(self, message):
         self.Densities = json.loads(message)
         logging.debug("@subGameDensity IC:%s gameDensity:%s\n", self.name, self.Densities)
+
+        file_exists=os.path.isfile(self.name+".csv")
+        with open(self.name+".csv", 'ab') as csvfile:
+            fieldnames = self.cardDict.values()
+            dW = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            if not file_exists:
+                dW.writeheader()
+            dW.writerow(self.Densities)
+            print "write to file"
+            #csvfile.flush()
 
         ICD = {'IC': self.name,
                'Densities' : self.Densities}
