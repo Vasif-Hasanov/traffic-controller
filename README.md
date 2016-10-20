@@ -18,11 +18,11 @@ browse to zcm install location
 
 add ```component_instance.name = instance["Name"]``` at line 40 of actor.py
 
-Configure Actors
+Configure
 --------------------
-```<project directory>/traffic-controller/cities-skylines2$```
+Open interfaceIC.py and set the IP address of the machine running Cities:skylines. 
 
-open assignIP.sh and set the IP addresses of the nodes. The following node positions are assumed: 
+Open assignIP.sh and set the IP addresses of the nodes. The following Intersection controller(IC) positions are assumed: 
 
  ```
  $$$$  1  $$$$$  1  $$$$
@@ -38,7 +38,7 @@ open assignIP.sh and set the IP addresses of the nodes. The following node posit
  $$$$  0  $$$$$  0  $$$$
  ```
  
-run assignIP.sh to generate bbb#.json files. Put the json config files on the target machines. 
+run assignIP.sh to generate bbb#.json files.  
 
 To start Intersection Controller 0
 -------------------------------------
