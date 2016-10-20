@@ -26,7 +26,6 @@ class IC(Component):
         self.LightState = {}
         self.Densities = {}
         self.initialized = False
-        self.ignoreDensities = False
         self.clock = time()
         self.minTime = 5
         self.maxTime = 20
@@ -44,6 +43,7 @@ class IC(Component):
                     'EIC':0,
                     'SIC':0,
                     'WIC':0}
+        self.ignoreDensities = False
         self.weight = .3 #how much influence surrounding ICs have
 
     def update(self):
@@ -84,14 +84,14 @@ class IC(Component):
         GreenQ = 0
         for seg in self.LightState:
             ICDs = self.ICs[self.SegDict[seg]+'IC']
-            #print "----------{}------------".format(ICDs)
+            print "----------{}------------".format(ICDs)
             if(self.LightState[seg]['vehicle'])=='Green':
                 GreenQ += self.Densities[seg] + ICDs*self.weight
             else:
                 RedQ += self.Densities[seg] + ICDs*self.weight
 
-        #print "name:{}, redQ:{}".format(self.name, RedQ)
-        #print "name:{}, GreenQ:{}".format(self.name, GreenQ)
+        print "name:{}, redQ:{}".format(self.name, RedQ)
+        print "name:{}, GreenQ:{}".format(self.name, GreenQ)
         if RedQ <= self.minDensity:
             return False
         if GreenQ > self.maxDensity:
