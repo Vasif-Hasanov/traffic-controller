@@ -20,7 +20,7 @@ add ```component_instance.name = instance["Name"]``` at line 40 of actor.py
 
 Configure Actors
 --------------------
-open assignIP.sh and net the IP addresses of the nodes. The following node positions are assumed: 
+open assignIP.sh and set the IP addresses of the nodes. The following node positions are assumed: 
 
  ```
  $$$$  1  $$$$$  1  $$$$
