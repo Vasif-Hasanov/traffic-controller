@@ -20,6 +20,8 @@ add ```component_instance.name = instance["Name"]``` at line 40 of actor.py
 
 Configure Actors
 --------------------
+```<project directory>/traffic-controller/cities-skylines2$```
+
 open assignIP.sh and set the IP addresses of the nodes. The following node positions are assumed: 
 
  ```
