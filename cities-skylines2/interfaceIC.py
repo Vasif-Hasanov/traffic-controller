@@ -10,6 +10,7 @@ class IFIC(Component):
         """Register the server operation"""
         Component.__init__(self)
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.gameServerIP = "192.168.0.111"
 
         self.register_timer_operation("pubGameLightState", self.pubGameLightState)
         self.register_timer_operation("pubGameDensity", self.pubGameDensity)
@@ -37,7 +38,7 @@ class IFIC(Component):
         self.sock.settimeout(1)
         msg_string = json.dumps(msg)
         #sock.sendto(data_string, ("localhost", 11000))
-        self.sock.sendto(msg_string, ("192.168.0.111", 11000))
+        self.sock.sendto(msg_string, (self.gameServerIP, 11000))
         try:
             response_str, srvr = self.sock.recvfrom(1024)
             #logging.info("@SEND response_str: %s", pprint.pformat(response_str))
