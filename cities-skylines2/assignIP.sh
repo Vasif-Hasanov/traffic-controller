@@ -16,13 +16,13 @@
 export node0="192.168.0.110" #bbb-bb19.local
 export n0="tcp:\/\/$node0"
 
-export node1="bbb-9178.local"
+export node1="192.168.0.108" #"bbb-9178.local"
 export n1="tcp:\/\/$node1"
 
-export node2="bbb-9cbd.local"
+export node2="192.168.0.105" #"bbb-9cbd.local"
 export n2="tcp:\/\/$node2"
 
-export node3="bbb-266a.local"
+export node3="192.168.0.100" #"bbb-266a.local"
 export n3="tcp:\/\/$node3"
 
 export IC0_ip="$n0:5000"
