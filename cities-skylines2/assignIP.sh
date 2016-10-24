@@ -26,9 +26,9 @@ export node3="192.168.0.100" #"bbb-266a.local"
 export n3="tcp:\/\/$node3"
 
 export IC0_ip="$n0:5000"
-export IC1_ip="$n0:5010"
-export IC2_ip="$n0:5020"
-export IC3_ip="$n0:5030"
+export IC1_ip="$n1:5010"
+export IC2_ip="$n2:5020"
+export IC3_ip="$n3:5030"
 
 #node 0 with node 1 north and node 3 east as neighbors
 export lightSensor_ip="$n0:7000"
@@ -51,9 +51,9 @@ sed s/\"SICendpoint\"//g -i $filename
 #sed 's/\"Endpoints\":.*$/\"Endpoints\": []/g' -i $filename
 
 #node 1 with node 2 east and node 0 south as neighbors
-export lightSensor_ip="$n0:7010"
-export densitySensor_ip="$n0:7110"
-export LightActuator_ip="$n0:7011"
+export lightSensor_ip="$n1:7010"
+export densitySensor_ip="$n1:7110"
+export LightActuator_ip="$n1:7011"
 export IC_densityPub_ip=$IC1_ip
 export filename="bbb1.json"
 
@@ -71,9 +71,9 @@ sed s/\"SICendpoint\"/\"$IC0_ip\"/g -i $filename
 #sed 's/\"Endpoints\":.*$/\"Endpoints\": []/g' -i $filename
 
 #node 2 with node 3 south and node 1 west as neighbors
-export lightSensor_ip="$n0:7020"
-export densitySensor_ip="$n0:7120"
-export LightActuator_ip="$n0:7021"
+export lightSensor_ip="$n2:7020"
+export densitySensor_ip="$n2:7120"
+export LightActuator_ip="$n2:7021"
 export IC_densityPub_ip=$IC2_ip
 export filename="bbb2.json"
 
@@ -90,9 +90,9 @@ sed s/\"SICendpoint\"/\"$IC3_ip\"/g -i $filename
 #sed 's/\"Endpoints\":.*$/\"Endpoints\": []/g' -i $filename
 
 #node 3 with node 0 west and node 2 north as neighbors
-export lightSensor_ip="$n0:7030"
-export densitySensor_ip="$n0:7130"
-export LightActuator_ip="$n0:7031"
+export lightSensor_ip="$n3:7030"
+export densitySensor_ip="$n3:7130"
+export LightActuator_ip="$n3:7031"
 export IC_densityPub_ip=$IC3_ip
 export filename="bbb3.json"
 
